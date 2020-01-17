@@ -9,7 +9,7 @@
       "appenders": [
         "console"
       ],
-      "level": "info"
+      "level": "debug"
     }
   }
 }

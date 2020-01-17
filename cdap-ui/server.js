@@ -36,6 +36,8 @@ var cdapConfig,
   hostname,
   hostIP = ip.address();
 
+var counter = 1;
+
 /**
  * Configuring the logger. In order to use the logger anywhere
  * in the BE, include the following:
@@ -155,8 +157,10 @@ cdapConfigurator
     });
 
     sockServer.on('connection', function(c) {
+      const id = `Socket${counter}`;
+      counter++;
       // @ts-ignore
-      var a = new Aggregator(c);
+      var a = new Aggregator(c, id);
       c.on('close', function() {
         a = null;
       });

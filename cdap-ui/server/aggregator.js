@@ -42,13 +42,15 @@ var POLL_INTERVAL = 10 * 1000;
  *
  * @param {Object} SockJS connection
  */
-function Aggregator(conn) {
+function Aggregator(conn, id) {
   // make 'new' optional
   if (!(this instanceof Aggregator)) {
     return new Aggregator(conn);
   }
   this.cdapConfig = null;
   this.connection = conn;
+
+  this.id = id;
 
   // WebSocket local resource pool. Key here is the resource id
   // as send from the backend. The FE has to guarantee that the
@@ -133,7 +135,8 @@ Aggregator.prototype.populateCdapConfig = async function() {
 Aggregator.prototype.startPolling = function(resource) {
   resource.interval = resource.interval || POLL_INTERVAL;
   log.debug(
-    '[SCHEDULING]: (id: ' +
+    this.id +
+    '\t[SCHEDULING]: (id: ' +
       resource.id +
       ', url: ' +
       resource.url +
@@ -157,7 +160,8 @@ Aggregator.prototype.startPolling = function(resource) {
  */
 Aggregator.prototype.scheduleAnotherIteration = function(resource) {
   log.debug(
-    '[RESCHEDULING]: (id: ' +
+    this.id +
+    '\t[RESCHEDULING]: (id: ' +
       resource.id +
       ', url: ' +
       resource.url +
@@ -191,7 +195,7 @@ Aggregator.prototype.stopPollingAll = function() {
   for (id in this.polledResources) {
     if (this.polledResources.hasOwnProperty(id)) {
       resource = this.polledResources[id].resource;
-      log.debug('[POLL-STOP]: (id: ' + resource.id + ', url: ' + resource.url + ')');
+      log.debug(this.id +'\t[POLL-STOP]: (id: ' + resource.id + ', url: ' + resource.url + ')');
       clearTimeout(resource.timerId);
     }
   }
@@ -384,7 +388,7 @@ function emitResponse(resource, error, response, body) {
       )
     );
   } else {
-    log.debug('[SUCCESS]: (id: ' + resource.id + ', url: ' + resource.url + ')');
+    // log.debug(this.id + '\t[SUCCESS]: (id: ' + resource.id + ', url: ' + resource.url + ')');
     log.trace(
       '[' +
         timeDiff +
@@ -409,7 +413,7 @@ function emitResponse(resource, error, response, body) {
     let newResource = Object.assign({}, resource, {
       url: urlHelper.deconstructUrl(this.cdapConfig, resource.url, resource.requestOrigin),
     });
-    log.debug('[RESPONSE]: (id: ' + newResource.id + ', url: ' + newResource.url + ')');
+    // log.debug(this.id + '\t[RESPONSE]: (id: ' + newResource.id + ', url: ' + newResource.url + ')');
     this.connection.write(
       JSON.stringify(
         {
@@ -451,18 +455,18 @@ function onSocketData(message) {
         this.pushConfiguration(r);
         break;
       case 'poll-start':
-        log.debug('[POLL-START]: (method: ' + r.method + ', id: ' + r.id + ', url: ' + r.url + ')');
+        log.debug(this.id + '\t[POLL-START]: (method: ' + r.method + ', id: ' + r.id + ', url: ' + r.url + ')');
         this.startPolling(r);
         break;
       case 'request':
         r.startTs = Date.now();
-        log.debug('[REQUEST]: (method: ' + r.method + ', id: ' + r.id + ', url: ' + r.url + ')');
+        log.debug(this.id + '\t[REQUEST]: (method: ' + r.method + ', id: ' + r.id + ', url: ' + r.url + ')');
         request(r, emitResponse.bind(this, r)).on('error', function(err) {
           log.error('[ERROR]: (url: ' + r.url + ') ' + err.message);
         });
         break;
       case 'poll-stop':
-        log.debug('[POLL-STOP]: (id: ' + r.id + ', url: ' + r.url + ')');
+        log.debug(this.id + '\t[POLL-STOP]: (id: ' + r.id + ', url: ' + r.url + ')');
         this.stopPolling(r);
         break;
     }
@@ -475,6 +479,7 @@ function onSocketData(message) {
  * @private onSocketClose
  */
 function onSocketClose() {
+  console.log(this.id + '\tSocket Close');
   this.stopPollingAll();
   this.polledResources = {};
 }
