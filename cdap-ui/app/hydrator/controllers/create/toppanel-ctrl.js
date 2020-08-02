@@ -57,6 +57,8 @@ class HydratorPlusPlusTopPanelCtrl {
     this.$stateParams = $stateParams;
     this.HydratorUpgradeService = HydratorUpgradeService;
 
+    this.closeLogs = this.closeLogs.bind(this);
+
     this.setState();
     this.setActiveNodes();
     this.HydratorPlusPlusConfigStore.registerOnChangeListener(this.setState.bind(this));
@@ -705,6 +707,11 @@ class HydratorPlusPlusTopPanelCtrl {
       this.previewRunning = false;
       this.dataSrc.stopPoll(poll.__pollId__);
     });
+  }
+
+  closeLogs() {
+    console.log('close');
+    this.viewLogs = false;
   }
 
   togglePreviewMode() {

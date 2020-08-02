@@ -21,13 +21,17 @@ import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import classnames from 'classnames';
+import IconButton from '@material-ui/core/IconButton';
+import Close from '@material-ui/icons/Close';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import If from 'components/If';
 
 export const TOP_PANEL_HEIGHT = '50px';
 
 const styles = (theme): StyleRules => {
   return {
     root: {
-      backgroundColor: theme.palette.grey[100],
+      backgroundColor: theme.palette.grey[400],
       color: theme.palette.white[50],
       display: 'flex',
       justifyContent: 'flex-end',
@@ -39,17 +43,24 @@ const styles = (theme): StyleRules => {
     },
     actionButton: {
       margin: theme.spacing(1),
+      backgroundColor: theme.palette.white[50],
+      color: theme.palette.blue[100],
 
       '&:hover': {
-        color: theme.palette.white[50],
-        borderColor: theme.palette.white[50],
-        backgroundColor: theme.palette.grey[200],
+        // color: theme.palette.white[50],
+        color: theme.palette.blue[100],
+        // borderColor: theme.palette.white[50],
+        backgroundColor: theme.palette.white[50],
       },
 
       '&:focus': {
-        color: 'inherit',
+        color: theme.palette.blue[100],
         outline: 'none',
         textDecoration: 'none',
+      },
+
+      '&:active': {
+        color: theme.palette.blue[100],
       },
 
       '&$disabled': {
@@ -58,6 +69,12 @@ const styles = (theme): StyleRules => {
         cursor: 'not-allowed',
         backgroundColor: theme.palette.white[50],
       },
+    },
+    downArrow: {
+      marginLeft: '5px',
+    },
+    closeButton: {
+      marginLeft: '30px',
     },
     disabled: {},
     checkboxContainer: {
@@ -75,6 +92,7 @@ interface ITopPanelProps extends WithStyles<typeof styles> {
   isPolling: boolean;
   getLatestLogs: () => void;
   setSystemLogs: (includeSystemLogs: boolean) => void;
+  onClose?: () => void;
 }
 
 const TopPanelView: React.FC<ITopPanelProps> = ({
@@ -83,6 +101,7 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
   isPolling,
   getLatestLogs,
   setSystemLogs,
+  onClose,
 }) => {
   const [includeSystemLogs, setLocalIncludeSystemLogs] = React.useState(
     dataFetcher.getIncludeSystemLogs()
@@ -127,32 +146,35 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
       />
 
       <Button
-        variant="outlined"
-        color="inherit"
+        variant="contained"
         className={classnames(classes.actionButton, { [classes.disabled]: isPolling })}
         disabled={isPolling}
         onClick={getLatestLogs}
       >
-        Get Latest Logs
+        Scroll to Latest Logs
+        <ArrowDownward className={classes.downArrow} />
       </Button>
       <Button
-        variant="outlined"
-        color="inherit"
+        variant="contained"
         className={classes.actionButton}
         href={getRawLogsUrl()}
         target="_blank"
       >
-        View Raw Logs
+        View Advanced Logs
       </Button>
       <Button
-        variant="outlined"
-        color="inherit"
+        variant="contained"
         className={classes.actionButton}
         href={getDownloadLogsUrl()}
         target="_blank"
       >
         Download All
       </Button>
+      <If condition={typeof onClose === 'function'}>
+        <IconButton className={classes.closeButton} onClick={onClose}>
+          <Close />
+        </IconButton>
+      </If>
     </div>
   );
 };
