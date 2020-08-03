@@ -132,7 +132,7 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
 
   return (
     <div className={classes.root}>
-      <FormControlLabel
+      {/* <FormControlLabel
         control={
           <Checkbox
             checked={includeSystemLogs}
@@ -143,7 +143,7 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
         }
         label="Include System Logs"
         className={classes.checkboxContainer}
-      />
+      /> */}
 
       <Button
         variant="contained"
@@ -154,13 +154,8 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
         Scroll to Latest Logs
         <ArrowDownward className={classes.downArrow} />
       </Button>
-      <Button
-        variant="contained"
-        className={classes.actionButton}
-        href={getRawLogsUrl()}
-        target="_blank"
-      >
-        View Advanced Logs
+      <Button variant="contained" className={classes.actionButton} onClick={handleToggleSystemLogs}>
+        {includeSystemLogs ? 'Hide' : 'VIEW'} Advanced Logs
       </Button>
       <Button
         variant="contained"
