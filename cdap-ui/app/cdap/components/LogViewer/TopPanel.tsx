@@ -27,14 +27,14 @@ import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import If from 'components/If';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 import Popover from 'components/Popover';
+import IconSVG from 'components/IconSVG';
 
 export const TOP_PANEL_HEIGHT = '50px';
 
 const styles = (theme): StyleRules => {
   return {
     root: {
-      backgroundColor: theme.palette.grey[400],
-      color: theme.palette.white[50],
+      backgroundColor: theme.palette.grey[900],
       display: 'flex',
       justifyContent: 'flex-end',
       alignItems: 'center',
@@ -75,6 +75,8 @@ const styles = (theme): StyleRules => {
     },
     closeButton: {
       marginLeft: '30px',
+      cursor: 'pointer',
+      fontSize: '16px',
     },
     disabled: {},
     checkboxContainer: {
@@ -94,6 +96,7 @@ const styles = (theme): StyleRules => {
     btnGroup: {
       display: 'flex',
       boxShadow: theme.shadows[2],
+      marginLeft: '8px',
 
       '& $actionButton': {
         margin: 0,
@@ -164,19 +167,6 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
 
   return (
     <div className={classes.root}>
-      {/* <FormControlLabel
-        control={
-          <Checkbox
-            checked={includeSystemLogs}
-            onChange={handleToggleSystemLogs}
-            color="default"
-            className={classes.checkbox}
-          />
-        }
-        label="Include System Logs"
-        className={classes.checkboxContainer}
-      /> */}
-
       <Button
         variant="contained"
         className={classnames(classes.actionButton, { [classes.disabled]: isPolling })}
@@ -219,9 +209,12 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
         </Popover>
       </div>
       <If condition={typeof onClose === 'function'}>
-        <IconButton className={classes.closeButton} onClick={onClose}>
-          <Close fontSize="large" />
-        </IconButton>
+        {/* <IconButton className={classes.closeButton} onClick={onClose}>
+          <Close />
+        </IconButton> */}
+        <span onClick={onClose} className={classes.closeButton}>
+          <IconSVG name="icon-close" />
+        </span>
       </If>
     </div>
   );
