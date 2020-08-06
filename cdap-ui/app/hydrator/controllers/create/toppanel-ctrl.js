@@ -710,7 +710,6 @@ class HydratorPlusPlusTopPanelCtrl {
   }
 
   closeLogs() {
-    console.log('close');
     this.viewLogs = false;
   }
 

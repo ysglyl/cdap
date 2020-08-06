@@ -25,6 +25,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import If from 'components/If';
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
+import Popover from 'components/Popover';
 
 export const TOP_PANEL_HEIGHT = '50px';
 
@@ -47,9 +49,7 @@ const styles = (theme): StyleRules => {
       color: theme.palette.blue[100],
 
       '&:hover': {
-        // color: theme.palette.white[50],
         color: theme.palette.blue[100],
-        // borderColor: theme.palette.white[50],
         backgroundColor: theme.palette.white[50],
       },
 
@@ -83,6 +83,38 @@ const styles = (theme): StyleRules => {
     },
     checkbox: {
       color: theme.palette.white[50],
+    },
+    popover: {
+      display: 'inline',
+
+      '& .popper': {
+        boxShadow: theme.shadows[3],
+      },
+    },
+    btnGroup: {
+      display: 'flex',
+      boxShadow: theme.shadows[2],
+
+      '& $actionButton': {
+        margin: 0,
+        boxShadow: 'none',
+      },
+    },
+    downloadBtn: {
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
+    },
+    dropdownBtn: {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      borderLeft: `1px solid ${theme.palette.grey[300]}`,
+      minWidth: 0,
+      paddingLeft: '5px',
+      paddingRight: '5px',
+
+      '&.active': {
+        backgroundColor: `${theme.palette.blue[300]}80`,
+      },
     },
   };
 };
@@ -157,17 +189,38 @@ const TopPanelView: React.FC<ITopPanelProps> = ({
       <Button variant="contained" className={classes.actionButton} onClick={handleToggleSystemLogs}>
         {includeSystemLogs ? 'Hide' : 'VIEW'} Advanced Logs
       </Button>
-      <Button
-        variant="contained"
-        className={classes.actionButton}
-        href={getDownloadLogsUrl()}
-        target="_blank"
-      >
-        Download All
-      </Button>
+      <div className={classes.btnGroup}>
+        <Button
+          variant="contained"
+          className={`${classes.actionButton} ${classes.downloadBtn}`}
+          href={getDownloadLogsUrl()}
+          target="_blank"
+        >
+          Download All
+        </Button>
+        <Popover
+          target={({ className }) => {
+            return (
+              <Button
+                variant="contained"
+                className={`${className} ${classes.actionButton} ${classes.dropdownBtn}`}
+              >
+                <ArrowDropDown />
+              </Button>
+            );
+          }}
+          className={classes.popover}
+          placement="bottom"
+          showOn="Click"
+        >
+          <a href={getRawLogsUrl()} target="_blank">
+            View Raw Logs
+          </a>
+        </Popover>
+      </div>
       <If condition={typeof onClose === 'function'}>
         <IconButton className={classes.closeButton} onClick={onClose}>
-          <Close />
+          <Close fontSize="large" />
         </IconButton>
       </If>
     </div>
