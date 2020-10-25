@@ -182,12 +182,18 @@ export function generateTableKey(row) {
   return `db-${database}-table-${table}`;
 }
 
-interface IColumn {
+export interface ITable {
+  database: string;
+  table: string;
+  schema?: string;
+}
+
+export interface IColumn {
   name: string;
   type: string;
 }
 
-enum DML {
+export enum DML {
   insert = 'INSERT',
   update = 'UPDATE',
   delete = 'DELETE',

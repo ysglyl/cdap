@@ -14,10 +14,12 @@
  * the License.
  */
 
-import { generateTableKey } from 'components/Replicator/utilities';
-import { Map } from 'immutable';
+import { generateTableKey, constructTablesSelection, DML } from 'components/Replicator/utilities';
+import { List, Map, Set } from 'immutable';
 
-describe.only('Replication Utilities', () => {
+type IColumn = Map<string, string>;
+
+describe('Replication Utilities', () => {
   describe('Generate Table Key', () => {
     const DB = 'dbName';
     const TABLE = 'tableName';
@@ -42,6 +44,72 @@ describe.only('Replication Utilities', () => {
 
       const key = generateTableKey(tableInfo);
       expect(key).toBe(CORRECT_KEY);
+    });
+  });
+
+  describe('Construct Table Selection', () => {
+    let tables: Map<string, Map<string, string>> = Map();
+    let columns: Map<string, List<IColumn>> = Map();
+    const dmlBlacklist: Map<string, Set<DML>> = Map();
+
+    beforeAll(() => {
+      // Generate tables
+      const rawTable = [
+        {
+          database: 'db1',
+          table: 'table1',
+          schema: 'schema1',
+        },
+        {
+          database: 'db1',
+          table: 'table2',
+          schema: 'schema1',
+        },
+        {
+          database: 'db1',
+          table: 'table3',
+          schema: 'schema1',
+        },
+      ];
+
+      rawTable.forEach((tableInfo) => {
+        const key = generateTableKey(tableInfo);
+        tables = tables.set(key, Map(tableInfo));
+
+        let rawColumns = List<IColumn>();
+        rawColumns = rawColumns.push(
+          Map({
+            name: `col-${tableInfo.table}-1`,
+            type: 'string',
+          })
+        );
+        rawColumns = rawColumns.push(
+          Map({
+            name: `col-${tableInfo.table}-2`,
+            type: 'string',
+          })
+        );
+
+        columns = columns.set(key, rawColumns);
+      });
+    });
+
+    it('should return empty array when no table is selected', () => {
+      const result = constructTablesSelection(null, null, null);
+      expect(result).toEqual([]);
+    });
+
+    it('should generate table selection', () => {
+      const result = constructTablesSelection(tables, columns, dmlBlacklist);
+
+      expect(result).toHaveLength(3);
+      expect(result[0].database).toBe('db1');
+      expect(result[0].table).toBe('table1');
+      expect(result[0].schema).toBe('schema1');
+
+      expect(result[0].columns).toHaveLength(2);
+      expect(result[0].columns[0].name).toBe('col-table1-1');
+      expect(result[0].columns[1].name).toBe('col-table1-2');
     });
   });
 });
