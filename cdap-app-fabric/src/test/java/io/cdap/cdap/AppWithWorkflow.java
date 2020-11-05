@@ -132,6 +132,7 @@ public class AppWithWorkflow extends AbstractApplication {
       workflowToken.put(TOKEN_KEY, TOKEN_VALUE);
     }
 
+
     @Override
     public void run() {
       LOG.info("Ran dummy action");
